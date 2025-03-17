@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "scr": "main.py",
+      "use": "@vercel/python",
+      "config": { "maxLamdaSize": "15mb" }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "main.py"
+    }
+  ]
+}
