@@ -5,8 +5,8 @@ import shutil
 
 app = FastAPI()
 
-UPLOAD_DIR = Path("uploads")
-UPLOAD_DIR.mkdir(exist_ok=True)
+UPLOAD_DIR = Path("/tmp/uploads")
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
