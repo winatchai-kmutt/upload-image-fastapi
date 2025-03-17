@@ -8,8 +8,12 @@ app = FastAPI()
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
-# ให้ FastAPI ให้บริการไฟล์ในโฟลเดอร์ "uploads"
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
+
+@app.get("/")
+async def root():
+    return {"message": "Hello world from Vee"}
 
 
 @app.post("/upload/")
