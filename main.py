@@ -1,3 +1,4 @@
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, UploadFile, File, Form, Request
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
@@ -7,6 +8,14 @@ app = FastAPI()
 
 UPLOAD_DIR = Path("/tmp/uploads")
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # ให้ FastAPI ให้บริการไฟล์ในโฟลเดอร์ "/tmp/uploads"
 app.mount("/uploads", StaticFiles(directory="/tmp/uploads"), name="uploads")
