@@ -10,7 +10,7 @@ UPLOAD_DIR = Path("/tmp/uploads")
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 origins = [
-    "http://localhost:61547"
+    "https://socialapp-cablocfirebase.web.app"
 ]
 
 app.add_middleware(
