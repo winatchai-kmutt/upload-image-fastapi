@@ -1,13 +1,22 @@
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, UploadFile, File, Form, Request
-from fastapi.staticfiles import StaticFiles
-from pathlib import Path
-import shutil
+from fastapi import FastAPI, UploadFile, File, Form
+import cloudinary
+import cloudinary.uploader
+from dotenv import load_dotenv
+import os
+
+# โหลด Environment Variables จากไฟล์ .env
+load_dotenv()
+
+# ตั้งค่า Cloudinary
+cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+    secure=True
+)
 
 app = FastAPI()
-
-UPLOAD_DIR = Path("/tmp/uploads")
-UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 origins = [
     "https://socialapp-cablocfirebase.web.app"
@@ -21,9 +30,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ให้ FastAPI ให้บริการไฟล์ในโฟลเดอร์ "/tmp/uploads"
-app.mount("/uploads", StaticFiles(directory="/tmp/uploads"), name="uploads")
-
 
 @app.get("/")
 async def root():
@@ -31,22 +37,20 @@ async def root():
 
 
 @app.post("/upload/")
-async def upload_image(
-    request: Request,
-    file: UploadFile = File(...),
-    folder_name: str = Form(...)
-):
-    folder_path = UPLOAD_DIR / folder_name
-    folder_path.mkdir(parents=True, exist_ok=True)
+async def upload_image(file: UploadFile = File(...), folder_name: str = Form(...)):
+    try:
+        # อัปโหลดรูปภาพไปยัง Cloudinary
+        upload_result = cloudinary.uploader.upload(
+            file.file, folder=folder_name, resource_type="image"
+        )
 
-    file_path = folder_path / file.filename
-    with file_path.open("wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+        # ดึง URL ของภาพที่อัปโหลดแล้ว
+        image_url = upload_result.get("secure_url")
 
-    base_url = str(request.base_url).rstrip('/')
-    full_url = f"{base_url}/uploads/{folder_name}/{file.filename}"
+        return {"image_url": image_url}
 
-    return {"image_url": full_url}
+    except Exception as e:
+        return {"error": str(e)}
 
 
 # uvicorn main:app --host 0.0.0.0 --port 8000 --reload
