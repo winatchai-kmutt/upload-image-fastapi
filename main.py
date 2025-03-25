@@ -29,7 +29,8 @@ firebase_admin.initialize_app(cred)
 app = FastAPI()
 
 origins = [
-    "https://socialapp-cablocfirebase.web.app"
+    "https://socialapp-cablocfirebase.web.app",
+    "https://julia-finance-dashboard.web.app"
 ]
 
 app.add_middleware(
